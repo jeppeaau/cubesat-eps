@@ -1,6 +1,7 @@
 #include "krnl.h"
 #include <util/delay.h>
 #include <avr/io.h>    
+#include "ina219.h"
 
 
 // A small krnl program with two independent tasks
@@ -40,6 +41,7 @@ void t2(void)
 
 void main()
 {
+  i2c_init();
 
   // init krnl so you can create 2 tasks, no semaphores and no message queues
   k_init(2,0,0); 

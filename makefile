@@ -17,7 +17,7 @@ OBJCOPY = avr-objcopy
 
 .PHONY: default
 default: main.hex main
-main: pwm.c krnl.c main.c
+main: pwm.c twimaster.c ina219.c krnl.c main.c
 
 %.hex: %
 	$(OBJCOPY) -O ihex $< $@
