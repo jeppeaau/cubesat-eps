@@ -4,6 +4,10 @@
 #include "ina219.h"
 
 
+#define BAUD 9600
+#define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)
+
+
 // A small krnl program with two independent tasks
 
 struct k_t *pt1, // pointer to hold reference
@@ -39,12 +43,50 @@ void t2(void)
   }  
 }
 
+
+void uart_init() {
+    UBRR0H = (BAUDRATE >> 8);
+    UBRR0L = (BAUDRATE);
+    UCSR0A &= ~(_BV(U2X0));
+    UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); // 8-bit data
+    UCSR0B = _BV(RXEN0) | _BV(TXEN0);   // Enable RX and TX
+}
+
+void uart_putchar(char c) {
+    while (!(UCSR0A & (1 << UDRE0)))
+        ; // Wait while register is free
+    UDR0 = c;
+}
+
 void main()
 {
+  uint16_t cal = 4096;
+  uint16_t addr = 0x80;
+  uint16_t voltage;
+
+  uart_init();
   i2c_init();
+  calibrate(cal, addr);
+
+  while (1)
+  {
+    voltage = read_voltage(addr);
+    _delay_ms(100);
+    uart_putchar(voltage);
+    uart_putchar(voltage >> 8);
+  }
+
+
+
+
+
+
+
+
+
 
   // init krnl so you can create 2 tasks, no semaphores and no message queues
-  k_init(2,0,0); 
+  //k_init(2,0,0); 
 
 // two task are created
 //               |------------ function used for body code for task
@@ -52,8 +94,8 @@ void main()
 //               |  | |------- array used for stak for task 
 //               |  | |   |--- staksize for array s1
 
-  pt1=k_crt_task(t1,11,s1,200); 
-  pt2=k_crt_task(t2,11,s2,200);
+  //pt1=k_crt_task(t1,11,s1,200); 
+  //pt2=k_crt_task(t2,11,s2,200);
   
   
   // NB-1 remember an Arduino has only 2-8 kByte RAM

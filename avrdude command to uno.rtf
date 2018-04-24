@@ -8,7 +8,14 @@
 
 \f0\fs26 \cf2 \expnd0\expndtw0\kerning0
 avrdude -p m328p -P 
-\fs28 \cf2 /dev/cu.usbmodemFD121
-\fs26 \cf2  -c arduino -b 
-\fs28 \cf2 115200
-\fs26 \cf2  -F -u -U flash:w:main.hex}
+\fs28 /dev/cu.usbmodemFD121
+\fs26  -c arduino -b 
+\fs28 115200
+\fs26  -F -u -U flash:w:main.hex\
+\
+\
+avrdude -p m328p -P 
+\fs28 /dev/cu.usbmodemFD121
+\fs26  -c arduino -b 
+\fs28 9600
+\fs26  -F -u -U flash:w:main.hex}

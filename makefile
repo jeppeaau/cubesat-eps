@@ -21,7 +21,3 @@ main: pwm.c twimaster.c ina219.c krnl.c main.c
 
 %.hex: %
 	$(OBJCOPY) -O ihex $< $@
-
-#avr-dude command
-########### avrdude -p m328p -P /dev/cu.usbmodemFD121 -c arduino -b 115200 -F -u -U flash:w:blink.hex
-#change MCU "m328p", port "/dev/cu.usbmodemFD121", bautrate "115200",
