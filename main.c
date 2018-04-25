@@ -113,25 +113,24 @@ void print_value(uint8_t val) {
 
 void main()
 {
-  uint16_t cal = 1024;
+  uint16_t cal = 29826;
   uint16_t addr = 0x40;
   uint16_t voltage;
 
   uart_init();
   i2c_init();
+  configuration(391, addr);
   calibrate(cal, addr);
   int i;
 
-    voltage = read_voltage(addr);
-    voltage = ((voltage >> 3)*4);
-    _delay_ms(10);
-    //uart_putchar(voltage);
-    //uart_putchar(voltage >> 8);
-    //_delay_ms(10);
+  _delay_ms(100);
 
-  print_value((voltage >> 8) & 0xF0);
+  voltage = read_voltage_mV(addr);
+  
+  _delay_ms(10);
+
   print_value((voltage >> 8) & 0x0F);
-  print_value(voltage & 0xF0);
+  print_value((voltage >> 4) & 0x0F);
   print_value(voltage & 0x0F);
   uart_putchar('\n');
 
