@@ -58,32 +58,82 @@ void uart_putchar(char c) {
     UDR0 = c;
 }
 
+void print_value(uint8_t val) {
+  switch (val) {
+      case 0:
+        uart_putchar('0');
+        break;
+      case 1:
+        uart_putchar('1');
+        break;
+      case 2:
+        uart_putchar('2');
+        break;
+      case 3:
+        uart_putchar('3');
+        break;
+      case 4:
+        uart_putchar('4');
+        break;
+      case 5:
+        uart_putchar('5');
+        break;
+      case 6:
+        uart_putchar('6');
+        break;
+      case 7:
+        uart_putchar('7');
+        break;
+      case 8:
+        uart_putchar('8');
+        break;
+      case 9:
+        uart_putchar('9');
+        break;
+      case 0x0A:
+        uart_putchar('A');
+        break;
+      case 0x0B:
+        uart_putchar('B');
+        break;
+      case 0x0C:
+        uart_putchar('C');
+        break;
+      case 0x0D:
+        uart_putchar('D');
+        break;
+      case 0x0E:
+        uart_putchar('E');
+        break;
+      case 0x0F:
+        uart_putchar('F');
+        break;
+    }
+}
+
 void main()
 {
-  uint16_t cal = 4096;
-  uint16_t addr = 0x80;
+  uint16_t cal = 1024;
+  uint16_t addr = 0x40;
   uint16_t voltage;
 
   uart_init();
   i2c_init();
   calibrate(cal, addr);
+  int i;
 
-  while (1)
-  {
     voltage = read_voltage(addr);
-    _delay_ms(100);
-    uart_putchar(voltage);
-    uart_putchar(voltage >> 8);
-  }
+    voltage = ((voltage >> 3)*4);
+    _delay_ms(10);
+    //uart_putchar(voltage);
+    //uart_putchar(voltage >> 8);
+    //_delay_ms(10);
 
-
-
-
-
-
-
-
-
+  print_value((voltage >> 8) & 0xF0);
+  print_value((voltage >> 8) & 0x0F);
+  print_value(voltage & 0xF0);
+  print_value(voltage & 0x0F);
+  uart_putchar('\n');
 
   // init krnl so you can create 2 tasks, no semaphores and no message queues
   //k_init(2,0,0); 
@@ -109,5 +159,5 @@ void main()
   // Both task has same priority so krnl will shift between the
   // tasks every 10 milli second (speed set in k_start)
 
-  k_start(1); // start kernel with tick speed 1 milli seconds
+  //k_start(1); // start kernel with tick speed 1 milli seconds
 }
