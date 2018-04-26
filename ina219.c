@@ -50,9 +50,14 @@ uint16_t read_voltage_mV(uint8_t addr)
 
 uint16_t read_current(uint8_t addr)
 {
-	return read_register(addr, 0x04);
+	return (read_register(addr, 0x04));
 }
 
+float read_current_mA(uint8_t addr)
+{
+	// curr_lsb = max_expected_current/2**15
+	return read_current(addr) / 10;
+}
 
 uint16_t read_power(uint8_t addr)
 {

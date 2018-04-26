@@ -113,25 +113,34 @@ void print_value(uint8_t val) {
 
 void main()
 {
-  uint16_t cal = 29826;
+  uint16_t cal = 27307;
   uint16_t addr = 0x40;
   uint16_t voltage;
+  uint16_t current;
+  float cur_lsb = 0.0001;
 
   uart_init();
   i2c_init();
-  configuration(391, addr);
+  configuration(6559, addr);
   calibrate(cal, addr);
   int i;
 
   _delay_ms(100);
 
   voltage = read_voltage_mV(addr);
-  
+  current = read_current_mA(addr);
   _delay_ms(10);
 
+  print_value((voltage >> 12) & 0x0F);
   print_value((voltage >> 8) & 0x0F);
   print_value((voltage >> 4) & 0x0F);
   print_value(voltage & 0x0F);
+  uart_putchar('\n');
+
+  print_value((current >> 12) & 0x0F);
+  print_value((current >> 8) & 0x0F);
+  print_value((current >> 4) & 0x0F);
+  print_value(current & 0x0F);
   uart_putchar('\n');
 
   // init krnl so you can create 2 tasks, no semaphores and no message queues
