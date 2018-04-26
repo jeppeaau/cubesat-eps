@@ -2,7 +2,7 @@
 
 ina219_t init_ina219(uint8_t addr, uint16_t config, uint16_t cal)
 {
-	return (ina219_t) {addr << 1, config, cal <<1};
+	return (ina219_t) {addr << 1, config, cal << 1};
 }
 
 void write_register(uint8_t addr, uint8_t offset, uint16_t value)
@@ -59,7 +59,7 @@ uint16_t read_current(ina219_t *ina)
 float read_current_mA(ina219_t *ina)
 {
 	// curr_lsb = max_expected_current/2**15
-	return 1.22 * (read_current(ina) / 10);
+	return 1.22 * (read_current(ina) * 1.0 / 10);
 }
 
 uint16_t read_power(ina219_t *ina)
