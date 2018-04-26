@@ -7,7 +7,7 @@ ina219_t init_ina219(uint8_t addr, uint16_t config, uint16_t cal)
 
 void write_register(uint8_t addr, uint8_t offset, uint16_t value)
 {
-	i2c_start_wait((addr << 1) & ~(0x01));				//set read/write bit to write
+	i2c_start_wait((addr) & ~(0x01));				//set read/write bit to write
 	i2c_write(offset);
 	i2c_write(value & 0xFF); 							// writs 8 lsb to i2c bus
 	i2c_write(value >> 8); 								//writes 8 msb to i2c bus
@@ -24,7 +24,7 @@ void calibrate(uint16_t cal, uint8_t addr)
 	//cal = 0.04096/(0.000091552734375 * 0.015)
 	//cal = 29826;
 
-	write_register(addr, 0x05, cal << 1);
+	write_register(addr, 0x05, cal);
 }
 
 void configuration(uint16_t config, uint8_t addr)
