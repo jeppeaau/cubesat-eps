@@ -56,7 +56,7 @@ uint16_t read_current(uint8_t addr)
 float read_current_mA(uint8_t addr)
 {
 	// curr_lsb = max_expected_current/2**15
-	return read_current(addr) / 10;
+	return 1.22 * (read_current(addr) / 10);
 }
 
 uint16_t read_power(uint8_t addr)
