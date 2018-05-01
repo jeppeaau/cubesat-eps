@@ -2,6 +2,7 @@
 #include <util/delay.h>
 #include <avr/io.h>
 #include "ina219.h"
+#include "tmp101.h"
 
 
 #define BAUD 9600
@@ -123,8 +124,8 @@ int main()
 
   uart_init();
   i2c_init();
-  configuration(ina.config, ina.addr);
-  calibrate(ina.cal, ina.addr);
+  calibrate_ina219(ina.cal, ina.addr);
+  configurate_ina219(ina.config, ina.addr);
 
   _delay_ms(100);
 
