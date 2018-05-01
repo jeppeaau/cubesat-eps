@@ -124,8 +124,8 @@ int main()
 
   uart_init();
   i2c_init();
-  calibrate_ina219(ina.cal, ina.addr);
-  configurate_ina219(ina.config, ina.addr);
+  calibrate_ina219(&ina);
+  configurate_ina219(&ina);
 
   _delay_ms(100);
 
