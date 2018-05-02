@@ -12,3 +12,5 @@ uint16_t config[CONFIG_SIZE];
 uint16_t battery_voltage;
 uint16_t bootcount_24hour;
 bool exit_safe_1 = 0;
+uint16_t pv_voltage_mv;  // used by mppt, ina needs to update this value regularly
+uint16_t pv_current_ma;	// used by mppt , ina needs to update this value regularly
