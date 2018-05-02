@@ -5,3 +5,5 @@
 
 uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uint8_t PWM, uint8_t *Direction );
 float Power(uint8_t PWM); //simulates inputpower reading
+
+void mppt();
