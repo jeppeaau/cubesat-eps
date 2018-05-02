@@ -4,6 +4,8 @@
 #include "ina219.h"
 #include "tmp101.h"
 #include "stm.h"
+#include "task.h"
+
 
 
 #define BAUD 9600
