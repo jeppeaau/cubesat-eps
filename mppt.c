@@ -1,7 +1,4 @@
-/*** blink.c – Blink a LED at PB5, repeatedly  -*- C -*- */
-#include <avr/io.h>             /* for DDRB, PORTB, etc. */
-#include <util/delay.h>         /* for _delay_ms () */
-#include <stdio.h>
+#include "mppt.h"
 
 uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uint8_t PWM, uint8_t *Direction ){
 
@@ -33,11 +30,13 @@ uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uin
 }
 
 
-float Power (uint8_t PWM){
+float Power(uint8_t PWM){
 	return -(PWM * PWM)/30 + 9 * PWM;
 }
 
 
+
+/*
 void main()
 {
 	uint8_t brightness = 175;
@@ -89,5 +88,5 @@ void main()
   		LastPower = CurrentPower;
     }
 }
-
+/*
 
