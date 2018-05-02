@@ -1,5 +1,6 @@
 #include "mppt.h"
 
+//hillclimb algorithm that 
 uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uint8_t PWM, uint8_t *Direction ){
 
 
@@ -30,20 +31,13 @@ uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uin
 }
 
 
-float Power(uint8_t PWM){
-	return -(PWM * PWM)/30 + 9 * PWM;
-}
+void mppt(){
 
-
-
-/*
-void main()
-{
-	uint8_t brightness = 175;
-	uint8_t pin = DDD6;
-	uint8_t Amount = 1;
-	float LastPower = 0;
-	uint8_t direction = 1;
+  uint16_t LastPower = 0;
+  uint8_t brightness = 175;
+  uint8_t pin = DDD6;
+  uint16_t stepSize = 5;
+  uint8_t direction = 1;
 
     DDRD |= (1 << pin);
     // PD6 is now an output
@@ -63,30 +57,11 @@ void main()
 
    while (1)
    {
-    	OCR0A = brightness;
-    	float CurrentPower = Power(brightness);
-    	
-    	//if (brightness <= 10 || brightness >= 245) {
-    	//fadeAmount = -fadeAmount;
-  		//}
-  		//if (brightness <= 100){
-  		//_delay_ms (15);
-  		//}
-  		//if (brightness <= 50){
-  		//_delay_ms (50);
-  		//}
-  		//_delay_ms (20);
+      OCR0A = brightness;
+      uint16_t currentPower = pv_voltage_mV * pv_current_mA;
 
-  		brightness = hillClimb(LastPower, CurrentPower, 5, brightness, &direction);
+      brightness = hillClimb(LastPower, currentPower, stepSize, brightness, &direction);
 
-  		_delay_ms (1000);
-
-  		OCR0A = 135;
-
-  		_delay_ms (1000);
-
-  		LastPower = CurrentPower;
+      LastPower = currentPower;
     }
 }
-/*
-
