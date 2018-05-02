@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include "ina219.h"
 #include "tmp101.h"
+#include "stm.h"
 
 
 #define BAUD 9600
@@ -114,36 +115,7 @@ void print_value(uint8_t val) {
 
 int main()
 {
-  uint8_t addr = 0x40;
-  uint16_t config = 6559;
-  uint16_t cal = 27307;
-  ina219_t ina = init_ina219(addr, config, cal);
-
-  uint16_t voltage;
-  uint16_t current;
-
-  uart_init();
   i2c_init();
-  calibrate_ina219(ina.cal, ina.addr);
-  configurate_ina219(ina.config, ina.addr);
-
-  _delay_ms(100);
-
-  voltage = read_voltage_mV(&ina);
-  current = read_current_mA(&ina);
-  _delay_ms(10);
-
-  print_value((voltage >> 12) & 0x0F);
-  print_value((voltage >> 8) & 0x0F);
-  print_value((voltage >> 4) & 0x0F);
-  print_value(voltage & 0x0F);
-  uart_putchar('\n');
-
-  print_value((current >> 12) & 0x0F);
-  print_value((current >> 8) & 0x0F);
-  print_value((current >> 4) & 0x0F);
-  print_value(current & 0x0F);
-  uart_putchar('\n');
 
   // init krnl so you can create 2 tasks, no semaphores and no message queues
   //k_init(2,0,0);
@@ -154,8 +126,8 @@ int main()
 //               |  | |------- array used for stak for task
 //               |  | |   |--- staksize for array s1
 
-  //pt1=k_crt_task(t1,11,s1,200);
-  //pt2=k_crt_task(t2,11,s2,200);
+  pt1=k_crt_task(t1,11,s1,200);
+  pt2=k_crt_task(t2,11,s2,200);
 
 
   // NB-1 remember an Arduino has only 2-8 kByte RAM
@@ -169,7 +141,7 @@ int main()
   // Both task has same priority so krnl will shift between the
   // tasks every 10 milli second (speed set in k_start)
 
-  //k_start(1); // start kernel with tick speed 1 milli seconds
+  k_start(1); // start kernel with tick speed 1 milli seconds
 
   return 0;
 }
