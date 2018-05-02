@@ -1,4 +1,4 @@
-#include "stm.h"
+#include "stm.h"	
 #include "task.h"
 
 
@@ -34,9 +34,9 @@ void state_logic()
 
 state_t safe() {
 		if(exit_safe_1 == 1)
-		{
+		{	
 			config[CONFIG_SIZE] = {Defalt,};   //// add all values before compiling!!!!!!
-			return SAFE_LITE_1;
+			return SAFE_LITE_2;
 		} else if(exit_safe_1 == 0) {
 			if(config[0] < battery_voltage)
 			{
