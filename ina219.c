@@ -5,16 +5,16 @@ ina219_t init_ina219(uint8_t addr, uint16_t config, uint16_t cal)
 	return (ina219_t) {addr << 1, config, cal << 1};
 }
 
-void write_register_ina219(uint8_t addr, uint8_t offset, uint16_t value)
+void write_register_ina219(ina219_t *ina, uint8_t offset, uint16_t value)
 {
-	i2c_start_wait((addr) & ~(0x01));				//set read/write bit to write
+	i2c_start_wait(ina->addr & ~(0x01));				//set read/write bit to write
 	i2c_write(offset);
 	i2c_write(value & 0xFF); 							// writs 8 lsb to i2c bus
 	i2c_write(value >> 8); 								//writes 8 msb to i2c bus
 	i2c_stop();
 }
 
-void calibrate_ina219(uint16_t cal, uint8_t addr)
+void calibrate_ina219(ina219_t *ina)
 {
 	//Current_LSB = trunc (Maximum Expected Current/2**15)
 	//cal = 0.04096/(Current_LSB * r_shunt)
@@ -24,12 +24,12 @@ void calibrate_ina219(uint16_t cal, uint8_t addr)
 	//cal = 0.04096/(0.000091552734375 * 0.015)
 	//cal = 29826;
 
-	write_register_ina219(addr, 0x05, cal);
+	write_register_ina219(ina, 0x05, ina->cal);
 }
 
-void configurate_ina219(uint16_t config, uint8_t addr)
+void configurate_ina219(ina219_t *ina)
 {
-	write_register_ina219(addr, 0x00, config);
+	write_register_ina219(ina, 0x00, ina->config);
 }
 
 uint16_t read_register_ina219(ina219_t *ina, uint8_t offset)
