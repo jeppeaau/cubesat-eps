@@ -104,18 +104,17 @@ void print_value(uint8_t val) {
 
 int main()
 {
-  antenna_launch = 
-
-  if(antenna_launch == 1 || total_bootcount == 0)
+  if(total_bootcount == 0)
   {
-    global_bootcount = bootcount(1);
+     launch_sequence();
   }
-  else
-  {
-    i2c_init();
 
-    // init krnl so you can create 2 tasks, no semaphores and no message queues
-    k_init(2,0,0);
+  global_bootcount = bootcount(1);
+
+  i2c_init();
+
+  // init krnl so you can create 2 tasks, no semaphores and no message queues
+  k_init(2,0,0);
 
 
   // two task are created
@@ -129,6 +128,5 @@ int main()
 
     k_start(1); // start kernel with tick speed 1 milli seconds
 
-    return 0;
-  }  
+    return 0;  
 }
