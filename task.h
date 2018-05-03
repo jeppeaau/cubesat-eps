@@ -16,3 +16,4 @@ uint16_t bootcount_24hour;
 uint8_t exit_safe_1 = 0;
 uint16_t pv_voltage_mv;  // used by mppt, ina needs to update this value regularly
 uint16_t pv_current_ma;	// used by mppt , ina needs to update this value regularly
+uint32_t global_bootcount;
