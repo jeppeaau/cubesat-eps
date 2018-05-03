@@ -1,20 +1,26 @@
 #include "mppt.h"
 
-//hillclimb algorithm that 
+// Hillclimb algorithm function that takes Power history and current power, stepsize and current modulation level (PWM).
+// The algorithm chooses whether to continue moving in the same direction.
+// Returns the updated PWM value.
 uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uint8_t PWM, uint8_t *Direction ){
 
 
 		if(currentPower >= lastPower){
+    // If the new power value is higher than or equal the old:
 			if(*Direction == 1){
+      // the system continues going up:
 			PWM = PWM + stepSize;
 			*Direction = 1;
 			}
 			else {
+      // or continues going down:
 				PWM = PWM - stepSize;
 				*Direction = 0;
 			}
 		}
 		else {
+    // Otherwise, the new power value is lower than the old, the system goes the opposite way compared to the last step:
 				if(*Direction == 1){
 			PWM = PWM - stepSize;
 			*Direction = 0;
@@ -27,14 +33,15 @@ uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uin
 
 
 	return PWM;
-
+  // The function returns the updated PWM value.
 }
 
 
 void mppt(){
 
+  // initialization of variables:
   uint16_t LastPower = 0;
-  uint8_t brightness = 175;
+  uint8_t modulation = 175;
   uint8_t pin = DDD6;
   uint16_t stepSize = 5;
   uint8_t direction = 1;
@@ -42,7 +49,7 @@ void mppt(){
     DDRD |= (1 << pin);
     // PD6 is now an output
 
-    OCR0A = brightness;
+    OCR0A = modulation;
     // set PWM for duty cycle
 
     TCCR0A |= (1 << COM0A1);
@@ -57,11 +64,16 @@ void mppt(){
 
    while (1)
    {
-      OCR0A = brightness;
-      uint16_t currentPower = pv_voltage_mV * pv_current_mA;
+      OCR0A = modulation;
+      // PWM output level is updated
 
-      brightness = hillClimb(LastPower, currentPower, stepSize, brightness, &direction);
+      uint16_t currentPower = pv_voltage_mV * pv_current_mA;
+      // The power value is calculated based on current voltage and current.
+
+      modulation = hillClimb(LastPower, currentPower, stepSize, modulation, &direction);
+      // PWM variable is updated, by calling the hillClimb function, based on new power calculation.
 
       LastPower = currentPower;
+      // Power level history variable is updated.
     }
 }
