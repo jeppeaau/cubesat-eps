@@ -5,7 +5,7 @@
 #include "tmp101.h"
 #include "stm.h"
 #include "task.h"
-
+#include <avr/eeprom.h>
 
 
 #define BAUD 9600
@@ -104,25 +104,31 @@ void print_value(uint8_t val) {
 
 int main()
 {
+  antenna_launch = 
+
+  if(antenna_launch == 1 || total_bootcount == 0)
+  {
+    global_bootcount = bootcount(1);
+  }
+  else
+  {
+    i2c_init();
+
+    // init krnl so you can create 2 tasks, no semaphores and no message queues
+    k_init(2,0,0);
 
 
+  // two task are created
+  //               |------------ function used for body code for task
+  //               |         |--------- priority (lower number= higher prio
+  //               |         |       |------- array used for stak for task
+  //               |         |       |            |--- staksize for array s1
 
+  pt1=k_crt_task(state_logic,11,state_logic_stak,200);
+  pt2=k_crt_task(t2,11,s2,200);
 
-  i2c_init();
+    k_start(1); // start kernel with tick speed 1 milli seconds
 
-  // init krnl so you can create 2 tasks, no semaphores and no message queues
-  k_init(2,0,0);
-
-// two task are created
-//               |------------ function used for body code for task
-//               |  |--------- priority (lower number= higher prio
-//               |  | |------- array used for stak for task
-//               |  | |   |--- staksize for array s1
-
- pt1=k_crt_task(state_logic,11,state_logic_stak,200);
- pt2=k_crt_task(t2,11,s2,200);
-
-  k_start(1); // start kernel with tick speed 1 milli seconds
-
-  return 0;
+    return 0;
+  }  
 }
