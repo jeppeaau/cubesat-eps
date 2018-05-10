@@ -1,79 +1,50 @@
 #include "mppt.h"
 
-// Hillclimb algorithm function that takes Power history and current power, stepsize and current modulation level (PWM).
-// The algorithm chooses whether to continue moving in the same direction.
-// Returns the updated PWM value.
-uint16_t hillClimb ( float lastPower, float currentPower, uint16_t stepSize, uint8_t PWM, uint8_t *Direction ){
-
-
-		if(currentPower >= lastPower){
-    // If the new power value is higher than or equal the old:
-			if(*Direction == 1){
-      // the system continues going up:
-			PWM = PWM + stepSize;
-			*Direction = 1;
-			}
-			else {
-      // or continues going down:
-				PWM = PWM - stepSize;
-				*Direction = 0;
-			}
-		}
-		else {
-    // Otherwise, the new power value is lower than the old, the system goes the opposite way compared to the last step:
-				if(*Direction == 1){
-			PWM = PWM - stepSize;
-			*Direction = 0;
-			}
-			else {
-				PWM = PWM + stepSize;
-				*Direction = 1;
-			}
+mppt_t init_mppt(uint16_t step_size, uint8_t duty_cycle) {
+  return (mppt_t){0, 0, step_size, duty_cycle, 1};
 }
 
+// Hillclimb algorithm function that takes Power history and current power,
+// stepsize and current modulation level (PWM). The algorithm chooses whether to
+// continue moving in the same direction. Returns the updated PWM value.
+uint16_t hillClimb(mppt_t *mppt) {
+  if (mppt->current_power >= mppt->last_power) {
+    // If the new power value is higher than or equal the old:
+    if (mppt->direction == 1) {
+      // the system continues going up:
+      mppt->duty_cycle += mppt->step_size;
+      mppt->direction = 1;
+    } else {
+      // or continues going down:
+      mppt->duty_cycle -= mppt->step_size;
+      mppt->direction = 0;
+    }
+  } else {
+    // Otherwise, the new power value is lower than the old, the system goes the
+    // opposite way compared to the last step:
+    if (mppt->direction == 1) {
+      mppt->duty_cycle -= mppt->step_size;
+      mppt->direction = 0;
+    } else {
+      mppt->duty_cycle += mppt->step_size;
+      mppt->direction = 1;
+    }
+  }
 
-	return PWM;
+  return mppt->duty_cycle;
   // The function returns the updated PWM value.
 }
 
+void mppt_update(mppt_t *mppt, uint16_t pv_voltage_mv, uint16_t pv_current_ma) {
+  pwm_set_duty_cycle(mppt->duty_cycle, DDD6);
 
-void mppt(){
+  mppt->current_power = pv_voltage_mv * pv_current_ma;
+  // The power value is calculated based on current voltage and current.
 
-  // initialization of variables:
-  uint16_t LastPower = 0;
-  uint8_t modulation = 175;
-  uint8_t pin = DDD6;
-  uint16_t stepSize = 5;
-  uint8_t direction = 1;
+  mppt->duty_cycle = hillClimb(mppt);
+  // PWM variable is updated, by calling the hillClimb function, based on new
+  // power calculation.
 
-    DDRD |= (1 << pin);
-    // PD6 is now an output
-
-    OCR0A = modulation;
-    // set PWM for duty cycle
-
-    TCCR0A |= (1 << COM0A1);
-    // set none-inverting mode
-
-    TCCR0A |= (1 << WGM01) | (1 << WGM00);
-    // set fast PWM Mode
-
-    TCCR0B |= (1 << CS02);
-    // set prescaler to 256 and starts PWM
-
-
-   while (1)
-   {
-      OCR0A = modulation;
-      // PWM output level is updated
-
-      uint16_t currentPower = pv_voltage_mV * pv_current_mA;
-      // The power value is calculated based on current voltage and current.
-
-      modulation = hillClimb(LastPower, currentPower, stepSize, modulation, &direction);
-      // PWM variable is updated, by calling the hillClimb function, based on new power calculation.
-
-      LastPower = currentPower;
-      // Power level history variable is updated.
-    }
+  mppt->last_power = mppt->current_power;
+  // Power level history variable is updated.
 }

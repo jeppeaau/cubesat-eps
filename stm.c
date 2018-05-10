@@ -1,84 +1,59 @@
-#include "stm.h"	
-#include "task.h"
+#include "stm.h"
 
+void state_logic(stm_t *stm, uint16_t battery_voltage, uint8_t exit_SAFE_1) {
+  switch (stm->current_state) {
+    case SAFE_1:
+      stm->next_state = safe(battery_voltage, exit_SAFE_1);
+      break;
 
-void state_logic()
-{
-	while(1)
-	{
-		switch(current_state)
-		{
-			case SAFE_1:
-				next_state = safe();
-				break;
+    case SAFE_LITE_2:
+      stm->next_state = safe_lite(battery_voltage);
+      break;
 
-			case SAFE_LITE_2:
-				next_state = safe_lite();
-				break;
+    case NORMAL_3:
+      stm->next_state = normal(battery_voltage);
+      break;
 
-			case NORMAL_3:
-				next_state = normal();
-				break;
+    default:
+      break;
+  }
 
-			default:
-				break;
-		}
-		
-		current_state = next_state;
-	}
+  stm->current_state = stm->next_state;
 }
 
+state_t safe(uint16_t battery_voltage, uint8_t exit_SAFE_1) {
+  if (exit_SAFE_1) {
+    // config[CONFIG_SIZE] = {Defalt,};   //// add all values before
+    // compiling!!!!!!
+    return SAFE_LITE_2;
+  } else if (!exit_SAFE_1) {
+    if (stm_config[0] < battery_voltage) {
+      return SAFE_LITE_2;
+    } else {
+      return SAFE_1;
+    }
+  }
 
-
-
-
-state_t safe() {
-		if(exit_safe_1 == 1)
-		{	
-			config[CONFIG_SIZE] = {Defalt,};   //// add all values before compiling!!!!!!
-			return SAFE_LITE_2;
-		} else if(exit_safe_1 == 0) {
-			if(config[0] < battery_voltage)
-			{
-				return SAFE_LITE_2;
-			} else {
-				return SAFE_1;
-			}
-		}
-
-	return SAFE_1;
+  return SAFE_1;
 }
 
-state_t safe_lite(){
-		if(config[1] < battery_voltage)
-		{
-			return NORMAL_3;
-			
-		}
-		else if(config[2] > battery_voltage)
-		{
-			return SAFE_1;
-			
-		}
-		else
-		{
-			return SAFE_LITE_2;
-			
-		}
+state_t safe_lite(uint16_t battery_voltage) {
+  if (stm_config[1] < battery_voltage) {
+    return NORMAL_3;
+
+  } else if (stm_config[2] > battery_voltage) {
+    return SAFE_1;
+
+  } else {
+    return SAFE_LITE_2;
+  }
 }
 
-state_t normal(){
-				if(config[3] > battery_voltage)
-				{
-					return SAFE_LITE_2;
-				}
-				else
-				{
-					return NORMAL_3;
-				}
-		return NORMAL_3;
+state_t normal(uint16_t battery_voltage) {
+  if (stm_config[3] > battery_voltage) {
+    return SAFE_LITE_2;
+  } else {
+    return NORMAL_3;
+  }
+  return NORMAL_3;
 }
-
-
-
-
