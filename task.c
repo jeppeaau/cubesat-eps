@@ -14,7 +14,15 @@ void boost_converter_sensor_task() {
 }
 
 void power_mode_stm_task() {
+  DDRD |= (1 << PD7);
   while (1) {
-    state_logic(&power_mode_stm, battery_voltage, exit_SAFE_1);
+    PORTD ^= 0x80;
+    // state_logic(&power_mode_stm, battery_voltage, exit_SAFE_1);
+    state_logic(&power_mode_stm, 0, 1);
+  }
+}
+
+void battery_control_task() {
+  while (1) {
   }
 }

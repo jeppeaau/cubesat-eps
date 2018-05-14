@@ -4,6 +4,7 @@
 #include "ina219.h"
 #include "mppt.h"
 #include "stm.h"
+#include "uart.h"
 
 #define CONFIG_SIZE 5
 
@@ -25,6 +26,11 @@ ina219_t boost_converter_ina;
 mppt_t mppt;
 
 void mppt_task();
+void battery_sensor_task();
 void boost_converter_sensor_task();
+void subsystem_sensor_task();
+void send_data();
 void power_mode_stm_task();
-void power_balancing_task();
+void battery_balancing_task();
+void battery_control_task();
+void logging_task();

@@ -23,8 +23,6 @@ void state_logic(stm_t *stm, uint16_t battery_voltage, uint8_t exit_SAFE_1) {
 
 state_t safe(uint16_t battery_voltage, uint8_t exit_SAFE_1) {
   if (exit_SAFE_1) {
-    // config[CONFIG_SIZE] = {Defalt,};   //// add all values before
-    // compiling!!!!!!
     return SAFE_LITE_2;
   } else if (!exit_SAFE_1) {
     if (stm_config[0] < battery_voltage) {

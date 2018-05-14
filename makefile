@@ -3,8 +3,8 @@
 #########################################################
 
 
-#MCU name 
-MCU     = atmega328p  
+#MCU name
+MCU     = atmega328p
 #MCU Frequency
 F_CPU   = 16000000
 
@@ -17,7 +17,8 @@ OBJCOPY = avr-objcopy
 
 .PHONY: default
 default: main.hex main
-main: mppt.c stm.c pwm.c twimaster.c ina219.c tmp101.c krnl.c onlaunch.c task.c main.c
+
+main: adc.c uart.c mppt.c stm.c pwm.c twimaster.c ina219.c tmp101.c krnl.c onlaunch.c task.c main.c
 
 %.hex: %
 	$(OBJCOPY) -O ihex $< $@
