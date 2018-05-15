@@ -1,4 +1,5 @@
 #include "mppt.h"
+#include "uart.h"
 
 mppt_t init_mppt(uint16_t step_size, uint8_t duty_cycle) {
   return (mppt_t){0, 0, step_size, duty_cycle, 1};

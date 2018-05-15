@@ -8,17 +8,16 @@
 #include "task.h"
 #include "uart.h"
 
-#define BAUD 9600
-#define BAUDRATE ((F_CPU) / (BAUD * 16UL) - 1)
-
-char boost_converter_ina_stack[50];
+char boost_converter_ina_stack[25];
 char mppt_stack[100];
 
 void update_bootcount() { bootcount++; }
-uint32_t read_bootcount() { return bootcount; }
+uint32_t read_bootcount() { return 1; }
 
 int main() {
-  init_pwm(175, DDD6);
+  uart_init();
+
+  // init_pwm(175, DDD6);
 
   bootcount = read_bootcount();
 
@@ -26,22 +25,27 @@ int main() {
     launch_sequence();
   }
 
-  update_bootcount();
+  // update_bootcount();
 
-  i2c_init();
+  // i2c_init();
 
-  boost_converter_ina = init_ina219(0x40, 6559, 27307);
-  configurate_ina219(&boost_converter_ina);
-  calibrate_ina219(&boost_converter_ina);
+  // boost_converter_ina = init_ina219(0x40, 6559, 27307);
+  // configurate_ina219(&boost_converter_ina);
+  // calibrate_ina219(&boost_converter_ina);
 
-  mppt = init_mppt(5, 175);
-
-  k_crt_task(boost_converter_sensor_task, 1, boost_converter_ina_stack, 25);
-  k_crt_task(mppt_task, 1, mppt_stack, 50);
+  // mppt = init_mppt(5, 175);
 
   // init krnl so you can create 2 tasks, no semaphores and no message
   // queues
   k_init(2, 0, 0);
+
+  struct k_t *task1 = k_crt_task(boost_converter_sensor_task, 12,
+                                 boost_converter_ina_stack, 25);
+  struct k_t *task2 = k_crt_task(mppt_task, 11, mppt_stack, 100);
+
+  k_start(10);
+
+  uart_putchar('n');
 
   return 0;
 }
