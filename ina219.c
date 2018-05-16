@@ -1,5 +1,7 @@
 #include "ina219.h"
 
+#include <util/delay.h>
+
 ina219_t init_ina219(uint8_t addr, uint16_t config, uint16_t cal) {
   return (ina219_t){addr << 1, config, cal << 1};
 }
@@ -32,6 +34,8 @@ uint16_t read_register_ina219(ina219_t *ina, uint8_t offset) {
   uint16_t reg;
   i2c_start_wait(ina->addr & ~(0x01));
   i2c_write(offset);
+  i2c_stop();
+  _delay_ms(5);
   i2c_rep_start(ina->addr | 0x01);
   reg = i2c_readAck();
   reg = (reg << 8) | i2c_readNak();
@@ -40,16 +44,27 @@ uint16_t read_register_ina219(ina219_t *ina, uint8_t offset) {
 }
 
 uint16_t read_voltage_mV(ina219_t *ina) {
-  return 4 * (read_register_ina219(ina, 0x02) >> 3);
+  uint16_t voltage = read_register_ina219(ina, 0x02);
+  if ((voltage & 0x01) || !(voltage & 0x02)) {
+    return 0;
+  }
+
+  return 4 * (voltage >> 3);
 }
 
 uint16_t read_current(ina219_t *ina) {
-  return (read_register_ina219(ina, 0x04));
+  uint16_t current = read_register_ina219(ina, 0x04);
+
+  if (current & 0x8000) {
+    return 0;
+  }
+
+  return current;
 }
 
 float read_current_mA(ina219_t *ina) {
   // curr_lsb = max_expected_current/2**15
-  return 1.22 * (read_current(ina) * 0.1);
+  return 1.22 * ((read_current(ina) * 0.1));
 }
 
 uint16_t read_power(ina219_t *ina) { return read_register_ina219(ina, 0x03); }
