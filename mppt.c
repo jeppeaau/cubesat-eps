@@ -8,7 +8,7 @@ mppt_t init_mppt(uint16_t step_size, uint8_t duty_cycle) {
 // Hillclimb algorithm function that takes Power history and current power,
 // stepsize and current modulation level (PWM). The algorithm chooses whether to
 // continue moving in the same direction. Returns the updated PWM value.
-uint16_t hillClimb(mppt_t *mppt) {
+void hillClimb(mppt_t *mppt) {
   if (mppt->current_power >= mppt->last_power) {
     // If the new power value is higher than or equal the old:
     if (mppt->direction == 1) {
@@ -39,10 +39,10 @@ uint16_t hillClimb(mppt_t *mppt) {
 void mppt_update(mppt_t *mppt, uint16_t pv_voltage_mv, uint16_t pv_current_ma) {
   pwm_set_duty_cycle(mppt->duty_cycle, DDD6);
 
-  mppt->current_power = pv_voltage_mv * pv_current_ma;
   // The power value is calculated based on current voltage and current.
+  mppt->current_power = (pv_voltage_mv * pv_current_ma) / 1000;
 
-  mppt->duty_cycle = hillClimb(mppt);
+  hillClimb(mppt);
   // PWM variable is updated, by calling the hillClimb function, based on new
   // power calculation.
 

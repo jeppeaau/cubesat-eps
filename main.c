@@ -8,16 +8,13 @@
 #include "task.h"
 #include "uart.h"
 
-char boost_converter_ina_stack[25];
-char mppt_stack[100];
-
 void update_bootcount() { bootcount++; }
 uint32_t read_bootcount() { return 1; }
 
 int main() {
   uart_init();
 
-  // init_pwm(175, DDD6);
+  init_pwm(170, DDD6);
 
   bootcount = read_bootcount();
 
@@ -25,27 +22,79 @@ int main() {
     launch_sequence();
   }
 
-  // update_bootcount();
+  update_bootcount();
 
-  // i2c_init();
+  i2c_init();
 
-  // boost_converter_ina = init_ina219(0x40, 6559, 27307);
-  // configurate_ina219(&boost_converter_ina);
-  // calibrate_ina219(&boost_converter_ina);
+  boost_converter_ina = init_ina219(0x40, 6559, 27307);
+  configurate_ina219(&boost_converter_ina);
+  calibrate_ina219(&boost_converter_ina);
 
-  // mppt = init_mppt(5, 175);
+  mppt = init_mppt(4, 170);
 
-  // init krnl so you can create 2 tasks, no semaphores and no message
-  // queues
-  k_init(2, 0, 0);
+  uint16_t p1;
+  uint16_t p2;
+  uint16_t p3;
+  uint16_t p4;
+  uint16_t p5;
 
-  struct k_t *task1 = k_crt_task(boost_converter_sensor_task, 12,
-                                 boost_converter_ina_stack, 25);
-  struct k_t *task2 = k_crt_task(mppt_task, 11, mppt_stack, 100);
+  uint16_t p_avg;
 
-  k_start(10);
+  while (1) {
+    boost_converter_sensor_task();
 
-  uart_putchar('n');
+    /*
+        p1 = pv_voltage_mv * pv_current_ma;
+
+        _delay_ms(5);
+
+        boost_converter_sensor_task();
+
+        p2 = pv_voltage_mv * pv_current_ma;
+
+        _delay_ms(5);
+
+        boost_converter_sensor_task();
+
+        p3 = pv_voltage_mv * pv_current_ma;
+
+        _delay_ms(5);
+
+        boost_converter_sensor_task();
+
+        p4 = pv_voltage_mv * pv_current_ma;
+
+        _delay_ms(5);
+
+        boost_converter_sensor_task();
+
+        p5 = pv_voltage_mv * pv_current_ma;
+
+        _delay_ms(5);
+
+        p_avg = (p1 + p2 + p3 + p4 + p5) / 5;
+        print_value((p_avg >> 12) & 0x0F);
+        print_value((p_avg >> 8) & 0x0F);
+        print_value((p_avg >> 4) & 0x0F);
+        print_value(p_avg & 0x0F);
+
+        uart_putchar('\n');
+        */
+
+    mppt_task();
+
+    _delay_ms(20);
+
+    /*
+        battery_sensor_task();
+        battery_balancing_task();
+        battery_control_task();
+
+        power_mode_stm_task();
+
+        subsystem_sensor_task();
+        */
+  }
 
   return 0;
 }

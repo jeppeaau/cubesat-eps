@@ -7,8 +7,8 @@
 #include "pwm.h"
 
 typedef struct {
-  float last_power;
-  float current_power;
+  uint32_t last_power;
+  uint32_t current_power;
   uint16_t step_size;
   uint8_t duty_cycle;
   uint8_t direction;
@@ -16,7 +16,7 @@ typedef struct {
 
 mppt_t init_mppt(uint16_t step_size, uint8_t duty_cycle);
 
-uint16_t hillClimb(mppt_t *mppt);
+void hillClimb(mppt_t *mppt);
 
 // float Power(uint8_t PWM);  // simulates inputpower reading
 

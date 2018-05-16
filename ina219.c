@@ -49,7 +49,7 @@ uint16_t read_current(ina219_t *ina) {
 
 float read_current_mA(ina219_t *ina) {
   // curr_lsb = max_expected_current/2**15
-  return 1.22 * (read_current(ina) * 1.0 / 10);
+  return 1.22 * (read_current(ina) * 0.1);
 }
 
 uint16_t read_power(ina219_t *ina) { return read_register_ina219(ina, 0x03); }
