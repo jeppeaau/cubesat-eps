@@ -6,12 +6,14 @@
 
 #include "pwm.h"
 
+typedef enum { UP, DOWN } direction_t;
+
 typedef struct {
   uint32_t last_power;
   uint32_t current_power;
   uint16_t step_size;
   uint8_t duty_cycle;
-  uint8_t direction;
+  direction_t direction;
 } mppt_t;
 
 mppt_t init_mppt(uint16_t step_size, uint8_t duty_cycle);

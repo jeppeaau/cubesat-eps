@@ -14,7 +14,7 @@ uint32_t read_bootcount() { return 1; }
 int main() {
   uart_init();
 
-  init_pwm(70, DDD6);
+  init_pwm(0, DDD6);
 
   bootcount = read_bootcount();
 
@@ -32,73 +32,23 @@ int main() {
   configurate_ina219(&boost_converter_ina);
   calibrate_ina219(&boost_converter_ina);
 
-  mppt = init_mppt(2, 0);
+  mppt = init_mppt(1, 0);
 
-  uint32_t p1;
-  uint32_t p2;
-  uint16_t p3;
-  uint16_t p4;
-  uint16_t p5;
+  k_init(3, 3, 0);  // 3 tasks, 3 semaphores, 0 messaegQueues */
 
-  uint32_t p_avg;
+  boost_converter_kt = k_crt_task(boost_converter_sensor_task, TASKPRIO,
+                                  boost_converter_stack, 50);
 
-  uint8_t duty_cycle = 0;
-  /*
-    while (1) {
-      _delay_ms(1000);
-      boost_converter_sensor_task();
-      p_avg = pv_current_ma * pv_voltage_mv;
-      print_value((p_avg >> 20) & 0x0F);
-      print_value((p_avg >> 16) & 0x0F);
-      print_value((p_avg >> 12) & 0x0F);
-      print_value((p_avg >> 8) & 0x0F);
-      print_value((p_avg >> 4) & 0x0F);
-      print_value(p_avg & 0x0F);
-      uart_putchar('\n');
-    }
-    */
+  mppt_kt = k_crt_task(mppt_task, TASKPRIO + 1, mppt_stack, 100);
 
-  _delay_ms(1000);
+  power_mode_kt =
+      k_crt_task(power_mode_stm_task, TASKPRIO + 2, power_mode_stack, 50);
 
-  mppt.duty_cycle = 0;
+  boost_converter_sem = k_crt_sem(0, 1);
+  mppt_sem = k_crt_sem(0, 1);
+  power_mode_sem = k_crt_sem(0, 1);
 
-  for (int i = 0; i < 255; i++) {
-    boost_converter_sensor_task();
-    p_avg = pv_current_ma * pv_voltage_mv;
-    print_value((p_avg >> 28) & 0x0F);
-    print_value((p_avg >> 24) & 0x0F);
-    print_value((p_avg >> 20) & 0x0F);
-    print_value((p_avg >> 16) & 0x0F);
-    print_value((p_avg >> 12) & 0x0F);
-    print_value((p_avg >> 8) & 0x0F);
-    print_value((p_avg >> 4) & 0x0F);
-    print_value(p_avg & 0x0F);
-    uart_putchar('\n');
-    duty_cycle = sweep(&mppt, duty_cycle, pv_voltage_mv, pv_current_ma);
-    _delay_ms(50);
-  }
-
-  mppt.duty_cycle = duty_cycle;
-
-  pwm_set_duty_cycle(duty_cycle, DDD6);
-
-  while (1) {
-    boost_converter_sensor_task();
-
-    // mppt_task();
-
-    //_delay_ms(9);
-
-    /*
-        battery_sensor_task();
-        battery_balancing_task();
-        battery_control_task();
-
-        power_mode_stm_task();
-
-        subsystem_sensor_task();
-        */
-  }
+  k_start(1); /* start krnl timer speed 1 milliseconds*/
 
   return 0;
 }

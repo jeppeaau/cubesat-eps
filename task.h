@@ -6,6 +6,13 @@
 #include "stm.h"
 #include "uart.h"
 
+#define TASKPRIO 10
+
+char mppt_stack[100], boost_converter_stack[50], power_mode_stack[50];
+struct k_t *mppt_kt, *mppt_sem;
+struct k_t *boost_converter_kt, *boost_converter_sem;
+struct k_t *power_mode_kt, *power_mode_sem;
+
 #define CONFIG_SIZE 5
 
 uint16_t battery_voltage;
