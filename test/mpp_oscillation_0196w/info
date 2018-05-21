@@ -1,0 +1,9 @@
+Tests the hill climb algorithm with step sizes from 1 to 5
+
+MPP:
+    - Max value 0.196W
+    - Min value 0.188W
+
+Input:
+    - 1.8V-1.9V
+    - 0.149A
