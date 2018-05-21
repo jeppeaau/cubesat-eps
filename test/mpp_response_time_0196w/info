@@ -1,0 +1,7 @@
+Tests the hill climb algorithm response time with step sizes 1, 3 and 5 over the PWM distances 32, 64 and 128 away
+
+MPP: 0.196W
+
+Input:
+    - 1.8V-1.9V
+    - 0.149A
