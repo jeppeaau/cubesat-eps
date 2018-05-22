@@ -39,11 +39,31 @@ void power_mode_stm_task() {
   k_set_sem_timer(power_mode_sem, 64);
   while (1) {
     k_wait(power_mode_sem, 0);
-    state_logic(&power_mode_stm, battery_voltage, exit_SAFE_1);
+    state_logic(&power_mode_stm, battery_voltage_both, exit_SAFE_1);
+  }
+}
+
+void battery_sensor_task() {
+  k_set_sem_timer(battery_sensor_sem, 40);
+  while (1) {
+    k_wait(battery_sensor_sem, 0);
+    battery_voltage_both = read_voltage_mV(&battery_sensor_both_ina);
+    battery_voltage_single = read_voltage_mV(&battery_sensor_single_ina);
   }
 }
 
 void battery_control_task() {
+  DDRD |= (1 << PD7) | (1 << PD6);
+  int32_t battery_voltage_delta;
+  k_set_sem_timer(battery_control_sem, 40);
   while (1) {
+    k_wait(battery_control_sem, 0);
+    battery_voltage_delta = battery_voltage_both - 2 * battery_voltage_single;
+
+    if (battery_voltage_delta >= 30 || battery_voltage_delta <= -30) {
+      PORTD |= (1 << PD7) | (1 << PD6);
+    } else if (battery_voltage_delta <= 5 || battery_voltage_delta >= -5) {
+      PORTD &= ~((1 << PD7) | (1 << PD6));
+    }
   }
 }
